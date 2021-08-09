@@ -9,7 +9,6 @@ const firebaseConfig = {
 	messagingSenderId: process.env.FIREBASE_SENDER_ID,
 	appId: process.env.FIREBASE_APP_ID,
 };
-console.log(process.env.FIREBASE_KEY);
 
 const app = firebase.initializeApp(firebaseConfig);
 

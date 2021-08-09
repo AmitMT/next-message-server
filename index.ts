@@ -4,23 +4,27 @@ import dotenv from 'dotenv';
 import cors from 'cors';
 dotenv.config();
 import messageRouter from './routes/message';
-import { db } from './firebase';
+import messageIOHandler from './socketHandlers/message';
+import 'firebase/firestore';
 
 // App setup
 const PORT = 5000;
 const app = express();
 
-app.use(cors({ origin: '*' }));
 app.use(express.json());
+app.use(express.urlencoded({ extended: false }));
 app.use(messageRouter);
+app.use(cors({ origin: [''].concat([process.env.CORS_ORIGIN as string]) }));
 
 const server = app.listen(PORT, () => {
-	console.log(`Listening on port ${PORT} (http://localhost:${PORT})`);
+	console.log(`Listening on http://localhost:${PORT}`);
 });
 
 // Socket setup
-const io = new Server(server);
+const io = new Server(server, {
+	cors: { origin: [''].concat([process.env.CORS_ORIGIN as string]) },
+});
 
 io.on('connection', (socket) => {
-	console.log('Made socket connection');
+	messageIOHandler(io, socket);
 });
