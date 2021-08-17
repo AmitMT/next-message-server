@@ -51,14 +51,23 @@ export const getChatByID = async (chatID: string) => {
 			await (lastMessage.user as firebase.firestore.DocumentReference).get()
 		).data();
 	return { id: chatID, name: chatName, members, lastMessage };
-
-	// const messagesDocsData = (await messagesCol.get()).docs.map((membersDoc) => membersDoc.data());
-	// for (const messagesDocData of messagesDocsData) {
-	// 	if (messagesDocData.user)
-	// 		messagesDocData.user = (
-	// 			await (messagesDocData.user as firebase.firestore.DocumentReference).get()
-	// 		).data();
-	// }
 };
 
-getChatByID('mnhfA6PTGiG3QM9kKCew').then(console.log);
+export const getMessagesByChatID = async (chatID: string) => {
+	const chatsCol = db.collection('chats');
+	const chatsDoc = await chatsCol.doc(chatID).get();
+	const messagesCol = chatsDoc.ref.collection('messages');
+
+	const messagesDocsData = (await messagesCol.orderBy('timestamp').get()).docs.map((membersDoc) =>
+		membersDoc.data()
+	);
+	for (const messagesDocData of messagesDocsData) {
+		if (messagesDocData.user)
+			messagesDocData.user = (
+				await (messagesDocData.user as firebase.firestore.DocumentReference).get()
+			).data();
+	}
+	return messagesDocsData;
+};
+
+// getMessagesByChatID('mnhfA6PTGiG3QM9kKCew').then(console.log);
